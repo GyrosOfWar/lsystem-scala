@@ -1,4 +1,4 @@
-name := "PROJECTNAME"
+name := "LSystem"
 
 version := "0.1"
 
