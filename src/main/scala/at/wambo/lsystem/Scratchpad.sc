@@ -59,15 +59,48 @@ object Scratchpad {
     }
   }
 
-  case class DrawAction(symbol: Char, action: (TurtleDrawing) => Unit)
-  val Forward = new DrawAction('F', (td: TurtleDrawing) => td.forward(5))
+
+
+  trait DrawAction {
+    val symbol: Char
+    val action: (TurtleDrawing) => Unit
+  }
+  case class Forward(distance: Int) extends DrawAction {
+    val symbol = 'F'
+    val action = (td: TurtleDrawing) => td.forward(distance)
+  }
+
+  case class AnglePlus(angle: Double) extends DrawAction {
+    val symbol = '+'
+    val action = (td: TurtleDrawing) => td.anglePlus(angle)
+  }
+
+  case class AngleMinus(angle: Double) extends DrawAction {
+    val symbol = '-'
+    val action = (td: TurtleDrawing) => td.angleMinus(angle)
+  }
+
+  case class PushStack() extends DrawAction {
+    val symbol = '['
+    val action = (td: TurtleDrawing) => td.pushStack()
+  }
+
+  case class PopStack() extends DrawAction {
+    val symbol = ']'
+    val action = (td: TurtleDrawing) => td.popStack()
+  }
+
   val dr = new TurtleDrawing
+
+  class LSystem {
+    // TODO
+  }
 
   def drawFunction(state: String): List[DrawAction] = {
     val buf = new mutable.ListBuffer[DrawAction]()
     for(c <- state) {
       c match {
-        //case DrawAction(d) => buf += d
+        case 'F' => buf += Forward(distance = 5)
         case _ => throw new IllegalArgumentException("bleh")
       }
     }
@@ -77,6 +110,10 @@ object Scratchpad {
 //  val s = drawFunction("FF+-")
   println("fffddd")
 }
+
+
+
+
 
 
 
