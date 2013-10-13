@@ -43,14 +43,15 @@ class LSystem(private val axiom: String,
    * Draws the L-System to the TurtleDrawing.
    */
   def draw() {
-    var state = axiom
-    for (x <- 0 until iterations) {
-      // Map the rules function onto the string
-      // getOrElse returns the String value if a String value is present or the parameter value (c) else.
-      state = (state map (c => rules(c, math.random).
-        getOrElse(c))).
-        mkString
+    def stepRec(current: String, n: Int): String = {
+      n match {
+        case 0 => current
+        case _ => stepRec(current.map {
+          c => rules(c, math.random).getOrElse(c)
+        } mkString, n-1)
+      }
     }
+    val state = stepRec(axiom, iterations)
     state map drawFunction
   }
 

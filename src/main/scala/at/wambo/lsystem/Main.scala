@@ -5,6 +5,7 @@ import org.jsfml.window.{Keyboard, Mouse, VideoMode}
 import org.jsfml.window.event.Event
 import org.jsfml.system.{Vector2f, Vector2i}
 import java.nio.file.Paths
+import collection.JavaConverters._
 
 /**
  * User: Martin
@@ -88,16 +89,12 @@ object Main {
     var transform = new Transform()
     transform = Transform.rotate(transform, -90)
 
-    // Load the shader
     val shader = new Shader()
-    // ugh
-    //    shader.loadFromFile(
-    //      Paths.get("frag.glsl"),
-    //      Paths.get("vert.glsl"))
 
-    shader.loadFromFile(
-      Paths.get(getClass.getClassLoader.getResource("frag.glsl").getPath),
-      Paths.get(getClass.getClassLoader.getResource("vert.glsl").getPath))
+    // Load the shader
+    //shader.loadFromFile(
+    //      Paths.get(getClass.getClassLoader.getResource("frag.glsl").getFile),
+    //      Paths.get(getClass.getClassLoader.getResource("vert.glsl").getFile))
     shader.setParameter("grayscale", grayscale)
     val state = new RenderStates(BlendMode.NONE, transform, null, shader)
 
@@ -105,17 +102,15 @@ object Main {
       l.draw()
     }
     while (window.isOpen) {
-      val e = window.pollEvent()
-      if (e != null) {
+      for(e <- window.pollEvents().asScala) {
         handleEvents(window, e, view, lSystems(selected))
       }
-      window.clear(Color.WHITE)
-      shader.setParameter("grayscale", grayscale)
+      window clear Color.WHITE
       for (v <- lSystems(selected).vertices) {
         if (v != null)
           window.draw(v, state)
       }
-      window.setView(view)
+      window setView view
       window.display()
     }
   }
