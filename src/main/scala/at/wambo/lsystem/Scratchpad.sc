@@ -25,7 +25,7 @@
 //  })
 //}
 
-import scala.collection.mutable.{ListBuffer, Stack}
+import scala.collection.mutable
 
 object Scratchpad {
   class Image(val xSize: Int = 800, val ySize: Int = 600) {
@@ -36,12 +36,12 @@ object Scratchpad {
     private var position = (0, 0)
     private var angle = 0.0
     var color = (255, 255, 255)
-    private val stack = new Stack[Double]
+    private val stack = new mutable.Stack[Double]
 
     def forward(distance: Int) {
       val newX = math.cos(angle) * distance
       val newY = math.sin(angle) * distance
-      position = (newX, newY).asInstanceOf[(Int, Int)]
+      position = (newX.toInt, newY.toInt)
     }
     def anglePlus(deg: Double) { angle += deg }
     def angleMinus(deg: Double) { angle -= deg }
@@ -54,7 +54,7 @@ object Scratchpad {
       val y = stack.pop()
       val x = stack.pop()
       val ang = stack.pop()
-      position = (x, y).asInstanceOf[(Int, Int)]
+      position = (x.toInt, y.toInt)
       angle = ang
     }
   }
@@ -64,7 +64,7 @@ object Scratchpad {
   val dr = new TurtleDrawing
 
   def drawFunction(state: String): List[DrawAction] = {
-    val buf = new ListBuffer[DrawAction]()
+    val buf = new mutable.ListBuffer[DrawAction]()
     for(c <- state) {
       c match {
         //case DrawAction(d) => buf += d

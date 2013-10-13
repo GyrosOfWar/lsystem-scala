@@ -6,7 +6,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 /**
- * User: Martin
+ * User: Martin Tomasi
  * Date: 27.05.13
  * Time: 16:50
  */
@@ -30,8 +30,8 @@ class TurtleDrawing() {
       vertices += new VertexArray(PrimitiveType.LINES)
     }
     val newPos = new Vector2f(
-      (position.x + Math.cos(angle) * distance).asInstanceOf[Float],
-      (position.y + Math.sin(angle) * distance).asInstanceOf[Float])
+      (position.x + Math.cos(angle) * distance).toFloat,
+      (position.y + Math.sin(angle) * distance).toFloat)
     if (!penUp) {
       vertices(verticesListIndex).add(new Vertex(position, color))
       vertices(verticesListIndex).add(new Vertex(newPos, color))
@@ -86,7 +86,7 @@ class TurtleDrawing() {
    * @param y Y coordinate for new position
    */
   def moveTo(x: Double, y: Double) {
-    position = new Vector2f(x.asInstanceOf[Float], y.asInstanceOf[Float])
+    position = new Vector2f(x.toFloat, y.toFloat)
   }
 
   /**
@@ -103,8 +103,8 @@ class TurtleDrawing() {
    * restores it.
    */
   def popStack() {
-    val y: Float = stack.pop().asInstanceOf[Float]
-    val x: Float = stack.pop().asInstanceOf[Float]
+    val y: Float = stack.pop().toFloat
+    val x: Float = stack.pop().toFloat
     val ang: Double = stack.pop()
 
     angle = ang

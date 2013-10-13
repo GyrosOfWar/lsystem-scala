@@ -7,8 +7,10 @@ import org.jsfml.system.{Vector2f, Vector2i}
 import java.nio.file.Paths
 import collection.JavaConverters._
 
+import at.wambo.lsystem.SFMLExtensions.Vector2fExtensions
+
 /**
- * User: Martin
+ * User: Martin Tomasi
  * Date: 29.05.13
  * Time: 15:17
  */
@@ -70,18 +72,34 @@ object Main {
     }
   }
 
+  def drawBounds(bounds: (Vector2f, Vector2f), window: RenderWindow) {
+
+    val circle1 = new CircleShape(12.0f)
+    val circle2 = new CircleShape(12.0f)
+    circle1.setFillColor(new Color(0, 0, 0, 128))
+    circle2.setFillColor(new Color(0, 0, 0, 128))
+
+    val vec1 = new Vector2f(1.0f, 2.0f)
+    val vec2 = new Vector2f(3.0f, 6.9f)
+
+    // Max
+    circle1.setPosition(bounds._1)
+    // Min
+    circle2.setPosition(bounds._1)
+  }
+
   def main(args: Array[String]) {
     val window = new RenderWindow(new VideoMode(xSize, ySize), "L-System")
     window.setFramerateLimit(60)
     val fixed = window.getView
     val view = new View(fixed.getCenter, fixed.getSize)
     view.setCenter(xSize / 2.0f, ySize / 2.0f)
-    val koch = LSystems.KochCurve(6, 10)
-    val dragonCurve = LSystems.DragonCurve(9, 10)
-    val fractalPlant = LSystems.FractalPlant(4, 10)
-    val stochasticPlant = LSystems.StochasticPlant(6, 10)
-    val carpet = LSystems.Carpet(5, 5)
-    val tree = LSystems.Tree(5, 5)
+    val koch = LSystem.KochCurve(6, 10)
+    val dragonCurve = LSystem.DragonCurve(9, 10)
+    val fractalPlant = LSystem.FractalPlant(4, 10)
+    val stochasticPlant = LSystem.StochasticPlant(6, 10)
+    val carpet = LSystem.Carpet(5, 5)
+    val tree = LSystem.Tree(5, 5)
     val lSystems = List(koch, dragonCurve, fractalPlant, stochasticPlant, carpet)
     LSystemCount = lSystems.length
 
@@ -110,6 +128,7 @@ object Main {
         if (v != null)
           window.draw(v, state)
       }
+      drawBounds(lSystems(selected).getBounds, window)
       window setView view
       window.display()
     }

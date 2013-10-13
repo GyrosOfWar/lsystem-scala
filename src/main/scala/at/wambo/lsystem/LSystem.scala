@@ -1,9 +1,12 @@
 package at.wambo.lsystem
 
-import org.jsfml.graphics.VertexArray
+import org.jsfml.graphics.{FloatRect, VertexArray}
+import collection.JavaConverters._
+import org.jsfml.system.Vector2f
+import at.wambo.lsystem.SFMLExtensions._
 
 /*
- * User: Martin
+ * User: Martin Tomasi
  * Date: 27.05.13
  * Time: 16:50
  */
@@ -60,9 +63,19 @@ class LSystem(private val axiom: String,
     td.clear()
     draw()
   }
+
+  def getBounds: (Vector2f, Vector2f) = {
+    val vertices = td.vertices.flatMap(_.asScala)
+    val xMax = (vertices map (_.position.x)).max
+    val yMax = (vertices map (_.position.y)).max
+    val xMin = (vertices map (_.position.x)).min
+    val yMin = (vertices map (_.position.y)).min
+
+    (new Vector2f(xMax, yMax), new Vector2f(xMin, yMin))
+  }
 }
 
-object LSystems {
+object LSystem {
   def FractalPlant(iterations: Int, distance: Int) = new LSystem("F", iterations, Math.toRadians(22), distance)({
     (c: Char, d: Double) => c match {
       case 'F' => Some("FF-[-F+F+F]+[+F-F-F]")
