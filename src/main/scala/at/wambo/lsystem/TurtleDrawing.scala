@@ -116,8 +116,8 @@ class TurtleDrawing() {
    * restores it.
    */
   def popStack() {
-    val y: Float = stack.pop().toFloat
-    val x: Float = stack.pop().toFloat
+    val y = stack.pop().toFloat
+    val x = stack.pop().toFloat
     val ang: Double = stack.pop()
 
     angle = ang
@@ -130,7 +130,6 @@ class TurtleDrawing() {
     val max = new Vector2f(xMax, yMax)
     val size = new Vector2f(xSize.toFloat, ySize.toFloat)
     val scaled = allVertices.map(vertex => {
-      //val pos = (vertex.position - min) / (max - min)
       val p = vertex.position
       val pos = (p - min) / (max - min) * size
       new Vertex(pos, vertex.color, vertex.texCoords)

@@ -9,6 +9,10 @@ import org.jsfml.system.{Vector2i, Vector2f}
  */
 object SFMLExtensions {
 
+  /**
+   * Defines some convenience operators and methods for the SFML Vector2f class.
+   * @param thisVec Vector2f to operate on.
+   */
   implicit class Vector2fExtensions(thisVec: Vector2f) {
     def +(thatVec: Vector2f) = Vector2f.add(thisVec, thatVec)
 
@@ -24,16 +28,33 @@ object SFMLExtensions {
 
     def /(thatVec: Vector2f) = Vector2f.componentwiseDiv(thisVec, thatVec)
 
+    /**
+     * Dot product of two vectors v1 and v2.
+     * @param thatVec other vector
+     * @return v1.x * v2.x + v1.y + v2.y
+     */
+    def dot(thatVec: Vector2f) = thisVec.x * thatVec.x + thisVec.y * thatVec.y
+
   }
 
+  /**
+   * Defines some convenience operators and methods for the SFML Vector2i class.
+   * @param thisVec Vector2i to operate on.
+   */
   implicit class Vector2iExtensions(thisVec: Vector2i) {
     def +(thatVec: Vector2i) = Vector2i.add(thisVec, thatVec)
 
-    def unary_-() = new Vector2i(-thisVec.x, -thisVec.y)
+    def unary_-() = Vector2i.neg(thisVec)
 
     def -(thatVec: Vector2i) = Vector2i.sub(thisVec, thatVec)
 
     def *(thatVec: Vector2i) = Vector2i.componentwiseMul(thisVec, thatVec)
+
+    def +(f: Int) = new Vector2i(thisVec.x + f, thisVec.y + f)
+
+    def -(f: Int) = new Vector2i(thisVec.x - f, thisVec.y - f)
+
+    def /(thatVec: Vector2i) = Vector2i.componentwiseDiv(thisVec, thatVec)
 
   }
 

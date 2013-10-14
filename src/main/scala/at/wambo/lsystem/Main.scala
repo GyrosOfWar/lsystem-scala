@@ -4,10 +4,7 @@ import org.jsfml.graphics._
 import org.jsfml.window.{Keyboard, Mouse, VideoMode}
 import org.jsfml.window.event.Event
 import org.jsfml.system.{Vector2f, Vector2i}
-import java.nio.file.Paths
-import collection.JavaConverters._
 
-import at.wambo.lsystem.SFMLExtensions.Vector2fExtensions
 
 import collection.JavaConverters._
 
@@ -17,17 +14,17 @@ import collection.JavaConverters._
  * Time: 15:17
  */
 object Main {
-  var mouseDrag: Boolean = false
-  var oldMousePos: Vector2i = new Vector2i(0, 0)
   val xSize = 1280
   val ySize = 800
-  var selected = 0
-  var LSystemCount: Int = 0
-  var scaleFactor = 1.0f
-  val moveDist = 8.0f
   val zoomInFactor = 1.2f
   val zoomOutFactor = 0.8f
-  var greyscale = 0.0f
+  val moveDist = 8.0f
+
+  var mouseDrag = false
+  var oldMousePos = new Vector2i(0, 0)
+  var selectedLSys = 0
+  var LSystemCount = 0
+  var scaleFactor = 1.0f
 
   def handleEvents(window: RenderWindow, event: Event, view: View, currentLSys: LSystem) {
     event.`type` match {
@@ -37,7 +34,6 @@ object Main {
       case Event.Type.MOUSE_MOVED if mouseDrag => {
         val pos = Mouse.getPosition(window)
         val delta = new Vector2f(oldMousePos.x - pos.x, oldMousePos.y - pos.y)
-        //view.setCenter(-pos.x, -pos.y)
         view.move(Vector2f.mul(delta, scaleFactor))
         oldMousePos = pos
       }
@@ -64,13 +60,12 @@ object Main {
       case Keyboard.Key.D => view.move(-moveDist * scaleFactor, 0)
       //case Keyboard.Key.O => ls.redraw(-1)
       //case Keyboard.Key.P => ls.redraw(1)
-      case Keyboard.Key.UP => selected = (selected + 1) % LSystemCount
+      case Keyboard.Key.UP => selectedLSys = (selectedLSys + 1) % LSystemCount
       case Keyboard.Key.DOWN => {
-        selected = selected - 1
-        if (selected < 0) selected = LSystemCount - 1
+        selectedLSys = selectedLSys - 1
+        if (selectedLSys < 0) selectedLSys = LSystemCount - 1
       }
-      case Keyboard.Key.G => greyscale = if (greyscale == 0.0f) 1.0f else 0.0f
-      case _ => {}
+      case _ =>
     }
   }
 
@@ -79,43 +74,40 @@ object Main {
     window.setFramerateLimit(60)
     val fixed = window.getView
     val view = new View(fixed.getCenter, fixed.getSize)
-    view.setCenter(xSize / 2.0f, ySize / 2.0f)
+
     val koch = LSystem.KochCurve(6)
     val dragonCurve = LSystem.DragonCurve(12)
     val fractalPlant = LSystem.FractalPlant(4)
     val stochasticPlant = LSystem.StochasticPlant(6)
     val carpet = LSystem.Carpet(5)
-    //val tree = LSystem.Tree(5, 1)
     val lSystems = List(koch, dragonCurve, fractalPlant, stochasticPlant, carpet)
     LSystemCount = lSystems.length
 
     // Rotate the l-systems by -90 degrees
     var transform = new Transform()
     transform = Transform.rotate(transform, -90)
-
-    val shader = new Shader()
-
-    // Load the shader
-    //shader.loadFromFile(
-    //      Paths.get(getClass.getClassLoader.getResource("frag.glsl").getFile),
-    //      Paths.get(getClass.getClassLoader.getResource("vert.glsl").getFile))
-    shader.setParameter("grayscale", greyscale)
-    val state = new RenderStates(BlendMode.NONE, transform, null, shader)
+    val state = new RenderStates(BlendMode.NONE, transform, null, null)
 
     for (l <- lSystems) {
+      // Draw each LSystem to their own TurtleDrawing
       l.draw()
+      // Scale them to the same size (sort of)
       l.scaleToView(xSize, ySize)
     }
     while (window.isOpen) {
-      for(e <- window.pollEvents().asScala) {
-        handleEvents(window, e, view, lSystems(selected))
+      // Handle all of the events
+      for (e <- window.pollEvents().asScala) {
+        handleEvents(window, e, view, lSystems(selectedLSys))
       }
 
       window clear Color.WHITE
-      for (v <- lSystems(selected).vertices) {
+      // Draw vertices of the LSystems
+      for (v <- lSystems(selectedLSys).vertices) {
         if (v != null)
           window.draw(v, state)
       }
+
+      // Set the view and swap the buffers
       window setView view
       window.display()
     }
