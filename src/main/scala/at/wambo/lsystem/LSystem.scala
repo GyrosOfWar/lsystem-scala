@@ -55,38 +55,32 @@ case class LSystem(axiom: String,
 
   def drawList: IndexedSeq[DrawAction] = step map drawChar
 
-  def draw() = drawList.foreach(a => a.action(td))
+  def draw() = drawList foreach(_.action(td))
 
   def getBounds(windowX: Float, windowY: Float): (Vector2f, Vector2f) = {
-    val allPositions = td.vertices.flatMap(_.asScala).map(vert => vert.position.x -> vert.position.y).filter {
-      case (f, g) => f < windowX && g < windowY
-    }
-    val xMax = allPositions.map(_._1).max
-    val xMin = allPositions.map(_._1).min
-    val yMax = allPositions.map(_._2).max
-    val yMin = allPositions.map(_._2).min
-
-    (new Vector2f(xMax, yMax), new Vector2f(xMin, yMin))
+    (new Vector2f(td.xMax, td.yMax), new Vector2f(td.xMin, td.yMin))
   }
+
+  def scaleToView(x: Int, y: Int) = td.scaleToView(x, y)
 }
 
 object LSystem {
 
-  def FractalPlant(iterations: Int, distance: Int) = LSystem("F", iterations, Math.toRadians(22), distance)({
+  def FractalPlant(iterations: Int, distance: Int = 1) = LSystem("F", iterations, Math.toRadians(22), distance)({
     (c: Char, d: Double) => c match {
       case 'F' => Some("FF-[-F+F+F]+[+F-F-F]")
       case _ => None
     }
   })
 
-  def KochCurve(iterations: Int, distance: Int) = LSystem("F", iterations, Math.PI / 2.0, distance)({
+  def KochCurve(iterations: Int, distance: Int = 1) = LSystem("F", iterations, Math.PI / 2.0, distance)({
     (c: Char, d: Double) => c match {
       case 'F' => Some("F+F-F-F+F")
       case _ => None
     }
   })
 
-  def DragonCurve(iterations: Int, distance: Int) = LSystem("FX", iterations, Math.PI / 2.0, distance)({
+  def DragonCurve(iterations: Int, distance: Int = 1) = LSystem("FX", iterations, Math.PI / 2.0, distance)({
     (c: Char, d: Double) => c match {
       case 'X' => Some("X+YF")
       case 'Y' => Some("FX-Y")
@@ -94,7 +88,7 @@ object LSystem {
     }
   })
 
-  def StochasticPlant(iterations: Int, distance: Int) = LSystem("F", iterations, Math.toRadians(30), distance)({
+  def StochasticPlant(iterations: Int, distance: Int = 1) = LSystem("F", iterations, Math.toRadians(30), distance)({
     (c: Char, d: Double) => c match {
       case 'F' if d < 1.0 / 3.0 => Some("F[+F]F[-F]F")
       case 'F' if d < 2.0 / 3.0 => Some("F[+F]F-F+")
@@ -103,14 +97,14 @@ object LSystem {
     }
   })
 
-  def Carpet(iterations: Int, distance: Int) = LSystem("F-F-F-F", iterations, Math.toRadians(90), distance)({
+  def Carpet(iterations: Int, distance: Int = 1) = LSystem("F-F-F-F", iterations, Math.toRadians(90), distance)({
     (c: Char, d: Double) => c match {
       case 'F' => Some("F[F]-F+F[--F]+F-F")
       case _ => None
     }
   })
 
-  def Tree(iterations: Int, distance: Int) = LSystem("G", iterations, Math.toRadians(100), distance)({
+  def Tree(iterations: Int, distance: Int = 1) = LSystem("G", iterations, Math.toRadians(100), distance)({
     (c: Char, d: Double) => c match {
       case 'G' => Some("F[+++++G][-------G]-F[++++G][------G]-F[+++G][-----G]-FG")
       case _ => None

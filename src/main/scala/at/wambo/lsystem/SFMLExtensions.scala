@@ -12,11 +12,17 @@ object SFMLExtensions {
   implicit class Vector2fExtensions(thisVec: Vector2f) {
     def +(thatVec: Vector2f) = Vector2f.add(thisVec, thatVec)
 
-    def unary_-() = new Vector2f(-thisVec.x, -thisVec.y)
+    def unary_-() = Vector2f.neg(thisVec)
 
     def -(thatVec: Vector2f) = Vector2f.sub(thisVec, thatVec)
 
     def *(thatVec: Vector2f) = Vector2f.componentwiseMul(thisVec, thatVec)
+
+    def +(f: Float) = new Vector2f(thisVec.x + f, thisVec.y + f)
+
+    def -(f: Float) = new Vector2f(thisVec.x - f, thisVec.y - f)
+
+    def /(thatVec: Vector2f) = Vector2f.componentwiseDiv(thisVec, thatVec)
 
   }
 

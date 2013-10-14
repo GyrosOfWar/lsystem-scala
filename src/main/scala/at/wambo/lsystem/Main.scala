@@ -9,6 +9,8 @@ import collection.JavaConverters._
 
 import at.wambo.lsystem.SFMLExtensions.Vector2fExtensions
 
+import collection.JavaConverters._
+
 /**
  * User: Martin Tomasi
  * Date: 29.05.13
@@ -25,7 +27,7 @@ object Main {
   val moveDist = 8.0f
   val zoomInFactor = 1.2f
   val zoomOutFactor = 0.8f
-  var grayscale = 0.0f
+  var greyscale = 0.0f
 
   def handleEvents(window: RenderWindow, event: Event, view: View, currentLSys: LSystem) {
     event.`type` match {
@@ -67,21 +69,9 @@ object Main {
         selected = selected - 1
         if (selected < 0) selected = LSystemCount - 1
       }
-      case Keyboard.Key.G => grayscale = if (grayscale == 0.0f) 1.0f else 0.0f
+      case Keyboard.Key.G => greyscale = if (greyscale == 0.0f) 1.0f else 0.0f
       case _ => {}
     }
-  }
-
-  def drawBounds(bounds: (Vector2f, Vector2f), window: RenderWindow) {
-
-    val circle1 = new CircleShape(150)
-    val circle2 = new CircleShape(150)
-    circle1.setFillColor(new Color(255, 0, 0, 128))
-    circle2.setFillColor(new Color(0, 255, 0, 128))
-    // Max
-    circle1.setPosition(bounds._1)
-    // Min
-    circle2.setPosition(bounds._1)
   }
 
   def main(args: Array[String]) {
@@ -90,12 +80,12 @@ object Main {
     val fixed = window.getView
     val view = new View(fixed.getCenter, fixed.getSize)
     view.setCenter(xSize / 2.0f, ySize / 2.0f)
-    val koch = LSystem.KochCurve(6, 10)
-    val dragonCurve = LSystem.DragonCurve(9, 10)
-    val fractalPlant = LSystem.FractalPlant(4, 10)
-    val stochasticPlant = LSystem.StochasticPlant(6, 10)
-    val carpet = LSystem.Carpet(5, 5)
-    val tree = LSystem.Tree(5, 5)
+    val koch = LSystem.KochCurve(6)
+    val dragonCurve = LSystem.DragonCurve(12)
+    val fractalPlant = LSystem.FractalPlant(4)
+    val stochasticPlant = LSystem.StochasticPlant(6)
+    val carpet = LSystem.Carpet(5)
+    //val tree = LSystem.Tree(5, 1)
     val lSystems = List(koch, dragonCurve, fractalPlant, stochasticPlant, carpet)
     LSystemCount = lSystems.length
 
@@ -109,11 +99,12 @@ object Main {
     //shader.loadFromFile(
     //      Paths.get(getClass.getClassLoader.getResource("frag.glsl").getFile),
     //      Paths.get(getClass.getClassLoader.getResource("vert.glsl").getFile))
-    shader.setParameter("grayscale", grayscale)
+    shader.setParameter("grayscale", greyscale)
     val state = new RenderStates(BlendMode.NONE, transform, null, shader)
 
     for (l <- lSystems) {
       l.draw()
+      l.scaleToView(xSize, ySize)
     }
     while (window.isOpen) {
       for(e <- window.pollEvents().asScala) {
@@ -121,8 +112,6 @@ object Main {
       }
 
       window clear Color.WHITE
-
-      drawBounds(lSystems(selected).getBounds(xSize, ySize), window)
       for (v <- lSystems(selected).vertices) {
         if (v != null)
           window.draw(v, state)

@@ -2,8 +2,10 @@ package at.wambo.lsystem
 
 import org.jsfml.graphics._
 import org.jsfml.system.Vector2f
-import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
+import collection.mutable
+import collection.mutable.ListBuffer
+import collection.JavaConverters._
+import at.wambo.lsystem.SFMLExtensions._
 
 /**
  * User: Martin Tomasi
@@ -19,6 +21,10 @@ class TurtleDrawing() {
   private var position = new Vector2f(0, 0)
   private var angle: Double = 0.0
   private var verticesListIndex = 0
+  var xMax = Float.NegativeInfinity
+  var yMax = Float.NegativeInfinity
+  var xMin = Float.PositiveInfinity
+  var yMin = Float.PositiveInfinity
 
   /**
    * Moves the turtle forward.
@@ -32,6 +38,13 @@ class TurtleDrawing() {
     val newPos = new Vector2f(
       (position.x + Math.cos(angle) * distance).toFloat,
       (position.y + Math.sin(angle) * distance).toFloat)
+
+    if (newPos.x > xMax) xMax = newPos.x
+    if (newPos.y > yMax) yMax = newPos.y
+
+    if (newPos.x < xMin) xMin = newPos.x
+    if (newPos.y < yMin) yMin = newPos.y
+
     if (!penUp) {
       vertices(verticesListIndex).add(new Vertex(position, color))
       vertices(verticesListIndex).add(new Vertex(newPos, color))
@@ -110,4 +123,24 @@ class TurtleDrawing() {
     angle = ang
     moveTo(x, y)
   }
+
+  def scaleToView(xSize: Int, ySize: Int) {
+    val allVertices = vertices.flatMap(_.asScala).toVector
+    val min = new Vector2f(xMin, yMin)
+    val max = new Vector2f(xMax, yMax)
+    println(s"min = $min, max = $max")
+    val scaled = allVertices.map(vertex => {
+      val pos = (vertex.position - min) / (max - min)
+      new Vertex(pos, vertex.color, vertex.texCoords)
+    }).grouped(1024).toVector
+
+    vertices.clear()
+
+    scaled foreach (vec => {
+      val vertexArray = new VertexArray(PrimitiveType.LINES)
+      vertexArray.addAll(vec.asJava)
+      vertices += vertexArray
+    })
+  }
+
 }
