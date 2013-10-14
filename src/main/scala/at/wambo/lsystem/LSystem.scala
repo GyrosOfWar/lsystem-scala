@@ -57,12 +57,14 @@ case class LSystem(axiom: String,
 
   def draw() = drawList.foreach(a => a.action(td))
 
-  def getBounds: (Vector2f, Vector2f) = {
-    val vertices = td.vertices.flatMap(_.asScala)
-    val xMax = (vertices map (_.position.x)).max
-    val yMax = (vertices map (_.position.y)).max
-    val xMin = (vertices map (_.position.x)).min
-    val yMin = (vertices map (_.position.y)).min
+  def getBounds(windowX: Float, windowY: Float): (Vector2f, Vector2f) = {
+    val allPositions = td.vertices.flatMap(_.asScala).map(vert => vert.position.x -> vert.position.y).filter {
+      case (f, g) => f < windowX && g < windowY
+    }
+    val xMax = allPositions.map(_._1).max
+    val xMin = allPositions.map(_._1).min
+    val yMax = allPositions.map(_._2).max
+    val yMin = allPositions.map(_._2).min
 
     (new Vector2f(xMax, yMax), new Vector2f(xMin, yMin))
   }

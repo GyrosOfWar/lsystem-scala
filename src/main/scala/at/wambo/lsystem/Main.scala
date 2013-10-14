@@ -74,14 +74,10 @@ object Main {
 
   def drawBounds(bounds: (Vector2f, Vector2f), window: RenderWindow) {
 
-    val circle1 = new CircleShape(12.0f)
-    val circle2 = new CircleShape(12.0f)
-    circle1.setFillColor(new Color(0, 0, 0, 128))
-    circle2.setFillColor(new Color(0, 0, 0, 128))
-
-    val vec1 = new Vector2f(1.0f, 2.0f)
-    val vec2 = new Vector2f(3.0f, 6.9f)
-
+    val circle1 = new CircleShape(150)
+    val circle2 = new CircleShape(150)
+    circle1.setFillColor(new Color(255, 0, 0, 128))
+    circle2.setFillColor(new Color(0, 255, 0, 128))
     // Max
     circle1.setPosition(bounds._1)
     // Min
@@ -123,12 +119,14 @@ object Main {
       for(e <- window.pollEvents().asScala) {
         handleEvents(window, e, view, lSystems(selected))
       }
+
       window clear Color.WHITE
+
+      drawBounds(lSystems(selected).getBounds(xSize, ySize), window)
       for (v <- lSystems(selected).vertices) {
         if (v != null)
           window.draw(v, state)
       }
-      drawBounds(lSystems(selected).getBounds, window)
       window setView view
       window.display()
     }
