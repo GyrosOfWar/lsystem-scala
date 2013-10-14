@@ -128,9 +128,11 @@ class TurtleDrawing() {
     val allVertices = vertices.flatMap(_.asScala).toVector
     val min = new Vector2f(xMin, yMin)
     val max = new Vector2f(xMax, yMax)
-    println(s"min = $min, max = $max")
+    val size = new Vector2f(xSize.toFloat, ySize.toFloat)
     val scaled = allVertices.map(vertex => {
-      val pos = (vertex.position - min) / (max - min)
+      //val pos = (vertex.position - min) / (max - min)
+      val p = vertex.position
+      val pos = (p - min) / (max - min) * size
       new Vertex(pos, vertex.color, vertex.texCoords)
     }).grouped(1024).toVector
 
