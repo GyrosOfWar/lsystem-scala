@@ -60,8 +60,8 @@ object Main {
       case Keyboard.Key.S => view.move(0, -moveDist * scaleFactor)
       case Keyboard.Key.A => view.move(moveDist * scaleFactor, 0)
       case Keyboard.Key.D => view.move(-moveDist * scaleFactor, 0)
-      case Keyboard.Key.O => ls.redraw(-1)
-      case Keyboard.Key.P => ls.redraw(1)
+      //case Keyboard.Key.O => ls.redraw(-1)
+      //case Keyboard.Key.P => ls.redraw(1)
       case Keyboard.Key.UP => selected = (selected + 1) % LSystemCount
       case Keyboard.Key.DOWN => {
         selected = selected - 1

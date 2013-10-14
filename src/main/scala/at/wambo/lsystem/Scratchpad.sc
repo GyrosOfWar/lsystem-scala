@@ -25,9 +25,11 @@
 //  })
 //}
 
+import scala.annotation.tailrec
 import scala.collection.mutable
 
 object Scratchpad {
+
   class Image(val xSize: Int = 800, val ySize: Int = 600) {
     private val data = Array.fill(xSize, ySize)(0)
   }
@@ -43,13 +45,21 @@ object Scratchpad {
       val newY = math.sin(angle) * distance
       position = (newX.toInt, newY.toInt)
     }
-    def anglePlus(deg: Double) { angle += deg }
-    def angleMinus(deg: Double) { angle -= deg }
+
+    def anglePlus(deg: Double) {
+      angle += deg
+    }
+
+    def angleMinus(deg: Double) {
+      angle -= deg
+    }
+
     def pushStack() {
       stack.push(angle)
       stack.push(position._1)
       stack.push(position._2)
     }
+
     def popStack() {
       val y = stack.pop()
       val x = stack.pop()
@@ -60,11 +70,11 @@ object Scratchpad {
   }
 
 
-
   trait DrawAction {
     val symbol: Char
     val action: (TurtleDrawing) => Unit
   }
+
   case class Forward(distance: Int) extends DrawAction {
     val symbol = 'F'
     val action = (td: TurtleDrawing) => td.forward(distance)
@@ -90,25 +100,32 @@ object Scratchpad {
     val action = (td: TurtleDrawing) => td.popStack()
   }
 
-  val dr = new TurtleDrawing
-
-  class LSystem {
-    // TODO
-  }
-
-  def drawFunction(state: String): List[DrawAction] = {
-    val buf = new mutable.ListBuffer[DrawAction]()
-    for(c <- state) {
-      c match {
-        case 'F' => buf += Forward(distance = 5)
-        case _ => throw new IllegalArgumentException("bleh")
+  class LSystem(val axiom: String, val iterations: Int, val angle: Double, val rules: (Char, Double) => Option[String], val distance: Int) {
+    def step: String = {
+      @tailrec
+      def stepRec(current: String, n: Int): String = {
+        n match {
+          case 0 => current
+          case _ => stepRec(current.map {
+            c => rules(c, math.random).getOrElse(c)
+          } mkString, n - 1)
+        }
       }
+
+     stepRec(axiom, iterations)
     }
 
-    buf.toList
+    def draw(): IndexedSeq[DrawAction] = step map drawChar
+
+    def drawChar(c: Char): DrawAction = c match {
+      case 'F' => Forward(distance)
+      case '+' => AnglePlus(angle)
+      case '-' => AngleMinus(angle)
+      case '[' => PushStack()
+      case ']' => PopStack()
+    }
   }
-//  val s = drawFunction("FF+-")
-  println("fffddd")
+
 }
 
 

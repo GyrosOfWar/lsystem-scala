@@ -1,9 +1,9 @@
 package at.wambo.lsystem
 
-import org.jsfml.graphics.{FloatRect, VertexArray}
+import org.jsfml.graphics.VertexArray
 import collection.JavaConverters._
 import org.jsfml.system.Vector2f
-import at.wambo.lsystem.SFMLExtensions._
+import scala.annotation.tailrec
 
 /*
  * User: Martin Tomasi
@@ -19,22 +19,12 @@ import at.wambo.lsystem.SFMLExtensions._
  * @param distance Distance in pixels to draw forward on when encountering a forward action in the state string
  * @param rules This is a representation of the rules of the L-System
  */
-class LSystem(private val axiom: String,
-              private var iterations: Int,
-              private val angle: Double,
-              private val distance: Int)
-             (private val rules: (Char, Double) => Option[String]) {
+case class LSystem(axiom: String,
+              iterations: Int,
+              angle: Double,
+              distance: Int)
+             (rules: (Char, Double) => Option[String]) {
   private val td = new TurtleDrawing()
-  private val drawFunction = (c: Char) => c match {
-    case 'X' | 'Y' => {}
-    case 'F' => td.forward(distance)
-    case 'G' => td.penUp = true; td.forward(distance); td.penUp = false
-    case '+' => td.anglePlus(angle)
-    case '-' => td.angleMinus(angle)
-    case '[' => td.pushStack()
-    case ']' => td.popStack()
-    case _ => throw new IllegalArgumentException("Not a valid character: " + c)
-  }
 
   /**
    * Accesses the list of VertexArrays of the TurtleDrawing
@@ -42,27 +32,30 @@ class LSystem(private val axiom: String,
    */
   def vertices: List[VertexArray] = td.vertices.toList
 
-  /**
-   * Draws the L-System to the TurtleDrawing.
-   */
-  def draw() {
-    def stepRec(current: String, n: Int): String = {
-      n match {
-        case 0 => current
-        case _ => stepRec(current.map {
-          c => rules(c, math.random).getOrElse(c)
-        } mkString, n-1)
-      }
+  def step: String = {
+    @tailrec
+    def stepRec(current: String, n: Int): String = n match {
+      case 0 => current
+      case _ => stepRec(current.map {
+        c => rules(c, math.random).getOrElse(c)
+      } mkString, n - 1)
     }
-    val state = stepRec(axiom, iterations)
-    state map drawFunction
+
+    stepRec(axiom, iterations)
   }
 
-  def redraw(iterationDelta: Int) {
-    iterations += iterationDelta
-    td.clear()
-    draw()
+  def drawChar(c: Char): DrawAction = c match {
+    case 'F' => Forward(distance)
+    case '+' => AnglePlus(angle)
+    case '-' => AngleMinus(angle)
+    case '[' => PushStack()
+    case ']' => PopStack()
+    case 'X' | 'Y' => NoOp()
   }
+
+  def drawList: IndexedSeq[DrawAction] = step map drawChar
+
+  def draw() = drawList.foreach(a => a.action(td))
 
   def getBounds: (Vector2f, Vector2f) = {
     val vertices = td.vertices.flatMap(_.asScala)
@@ -76,21 +69,22 @@ class LSystem(private val axiom: String,
 }
 
 object LSystem {
-  def FractalPlant(iterations: Int, distance: Int) = new LSystem("F", iterations, Math.toRadians(22), distance)({
+
+  def FractalPlant(iterations: Int, distance: Int) = LSystem("F", iterations, Math.toRadians(22), distance)({
     (c: Char, d: Double) => c match {
       case 'F' => Some("FF-[-F+F+F]+[+F-F-F]")
       case _ => None
     }
   })
 
-  def KochCurve(iterations: Int, distance: Int) = new LSystem("F", iterations, Math.PI / 2.0, distance)({
+  def KochCurve(iterations: Int, distance: Int) = LSystem("F", iterations, Math.PI / 2.0, distance)({
     (c: Char, d: Double) => c match {
       case 'F' => Some("F+F-F-F+F")
       case _ => None
     }
   })
 
-  def DragonCurve(iterations: Int, distance: Int) = new LSystem("FX", iterations, Math.PI / 2.0, distance)({
+  def DragonCurve(iterations: Int, distance: Int) = LSystem("FX", iterations, Math.PI / 2.0, distance)({
     (c: Char, d: Double) => c match {
       case 'X' => Some("X+YF")
       case 'Y' => Some("FX-Y")
@@ -98,7 +92,7 @@ object LSystem {
     }
   })
 
-  def StochasticPlant(iterations: Int, distance: Int) = new LSystem("F", iterations, Math.toRadians(30), distance)({
+  def StochasticPlant(iterations: Int, distance: Int) = LSystem("F", iterations, Math.toRadians(30), distance)({
     (c: Char, d: Double) => c match {
       case 'F' if d < 1.0 / 3.0 => Some("F[+F]F[-F]F")
       case 'F' if d < 2.0 / 3.0 => Some("F[+F]F-F+")
@@ -107,14 +101,14 @@ object LSystem {
     }
   })
 
-  def Carpet(iterations: Int, distance: Int) = new LSystem("F-F-F-F", iterations, Math.toRadians(90), distance)({
+  def Carpet(iterations: Int, distance: Int) = LSystem("F-F-F-F", iterations, Math.toRadians(90), distance)({
     (c: Char, d: Double) => c match {
       case 'F' => Some("F[F]-F+F[--F]+F-F")
       case _ => None
     }
   })
 
-  def Tree(iterations: Int, distance: Int) = new LSystem("G", iterations, Math.toRadians(100), distance)({
+  def Tree(iterations: Int, distance: Int) = LSystem("G", iterations, Math.toRadians(100), distance)({
     (c: Char, d: Double) => c match {
       case 'G' => Some("F[+++++G][-------G]-F[++++G][------G]-F[+++G][-----G]-FG")
       case _ => None
