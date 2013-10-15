@@ -142,6 +142,12 @@ class TurtleDrawing() {
       vertexArray.addAll(vec.asJava)
       vertices += vertexArray
     })
+
+    this.xMax = scaled.flatten.map(_.position.x).max
+    this.yMax = scaled.flatten.map(_.position.y).max
+    this.xMin = scaled.flatten.map(_.position.x).min
+    this.yMin = scaled.flatten.map(_.position.y).min
+    println(s"max = ${(xMax, yMax)}, min = ${(xMin, yMin)}")
   }
 
 }

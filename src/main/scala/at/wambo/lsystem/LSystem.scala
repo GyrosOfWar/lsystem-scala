@@ -19,7 +19,7 @@ import scala.annotation.tailrec
  * @param rules A function that returns Some[String] if given a production that has a defined result, else None.
  */
 case class LSystem(axiom: String,
-                   iterations: Int,
+                   var iterations: Int,
                    angle: Double,
                    distance: Int)
                   (rules: (Char, Double) => Option[String]) {
@@ -89,8 +89,11 @@ case class LSystem(axiom: String,
    */
   def scaleToView(xSize: Int, ySize: Int) = td.scaleToView(xSize, ySize)
 
-  // TODO implement
-  def redraw(iterDelta: Int) = ???
+  def redraw(iterDelta: Int) = {
+    iterations += iterDelta
+    td.clear()
+    draw()
+  }
 }
 
 object LSystem {
