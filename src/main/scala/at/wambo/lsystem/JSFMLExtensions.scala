@@ -7,7 +7,7 @@ import org.jsfml.system.{Vector2i, Vector2f}
  * Date: 14.10.13
  * Time: 00:12
  */
-object SFMLExtensions {
+object JSFMLExtensions {
 
   /**
    * Defines some convenience operators and methods for the SFML Vector2f class.

@@ -5,7 +5,7 @@ import org.jsfml.system.Vector2f
 import collection.mutable
 import collection.mutable.ListBuffer
 import collection.JavaConverters._
-import at.wambo.lsystem.SFMLExtensions._
+import at.wambo.lsystem.JSFMLExtensions._
 
 /**
  * User: Martin Tomasi
@@ -72,9 +72,7 @@ class TurtleDrawing() {
    * Resets the TurtleDrawing to its initial state.
    */
   def clear() {
-    for (v <- vertices) {
-      v.clear()
-    }
+    vertices foreach (_.clear())
     stack.clear()
     angle = 0
     position = new Vector2f(0, 0)
@@ -118,7 +116,7 @@ class TurtleDrawing() {
   def popStack() {
     val y = stack.pop().toFloat
     val x = stack.pop().toFloat
-    val ang: Double = stack.pop()
+    val ang = stack.pop()
 
     angle = ang
     moveTo(x, y)
@@ -135,7 +133,7 @@ class TurtleDrawing() {
       new Vertex(pos, vertex.color, vertex.texCoords)
     }).grouped(1024).toVector
 
-    vertices.clear()
+    this.clear()
 
     scaled foreach (vec => {
       val vertexArray = new VertexArray(PrimitiveType.LINES)
@@ -143,11 +141,14 @@ class TurtleDrawing() {
       vertices += vertexArray
     })
 
-    this._xMax = scaled.flatten.map(_.position.x).max
-    this._yMax = scaled.flatten.map(_.position.y).max
-    this._xMin = scaled.flatten.map(_.position.x).min
-    this._yMin = scaled.flatten.map(_.position.y).min
-    println(s"max = ${(_xMax, _yMax)}, min = ${(_xMin, _yMin)}")
+    val xs = scaled.flatten.map(_.position.x)
+    val ys = scaled.flatten.map(_.position.y)
+
+    this._xMax = xs.max
+    this._yMax = ys.max
+    this._xMin = xs.min
+    this._yMin = ys.min
+
   }
 
   def xMax = _xMax
