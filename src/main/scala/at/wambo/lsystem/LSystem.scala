@@ -72,7 +72,7 @@ case class LSystem(axiom: String,
   /**
    * Draws the DrawActions to the turtle drawing by executing its action.
    */
-  def draw() = drawList foreach (_.action(td))
+  def draw(): Unit = drawList foreach (_.action(td))
 
   /**
    * Returns the minimum and maximum values of all the vertex positions in the LSystem.

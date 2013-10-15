@@ -21,10 +21,10 @@ class TurtleDrawing() {
   private var position = new Vector2f(0, 0)
   private var angle: Double = 0.0
   private var verticesListIndex = 0
-  var xMax = Float.NegativeInfinity
-  var yMax = Float.NegativeInfinity
-  var xMin = Float.PositiveInfinity
-  var yMin = Float.PositiveInfinity
+  private var _xMax = Float.NegativeInfinity
+  private var _yMax = Float.NegativeInfinity
+  private var _xMin = Float.PositiveInfinity
+  private var _yMin = Float.PositiveInfinity
 
   /**
    * Moves the turtle forward.
@@ -39,11 +39,11 @@ class TurtleDrawing() {
       (position.x + Math.cos(angle) * distance).toFloat,
       (position.y + Math.sin(angle) * distance).toFloat)
 
-    if (newPos.x > xMax) xMax = newPos.x
-    if (newPos.y > yMax) yMax = newPos.y
+    if (newPos.x > _xMax) _xMax = newPos.x
+    if (newPos.y > _yMax) _yMax = newPos.y
 
-    if (newPos.x < xMin) xMin = newPos.x
-    if (newPos.y < yMin) yMin = newPos.y
+    if (newPos.x < _xMin) _xMin = newPos.x
+    if (newPos.y < _yMin) _yMin = newPos.y
 
     if (!penUp) {
       vertices(verticesListIndex).add(new Vertex(position, color))
@@ -126,8 +126,8 @@ class TurtleDrawing() {
 
   def scaleToView(xSize: Int, ySize: Int) {
     val allVertices = vertices.flatMap(_.asScala).toVector
-    val min = new Vector2f(xMin, yMin)
-    val max = new Vector2f(xMax, yMax)
+    val min = new Vector2f(_xMin, _yMin)
+    val max = new Vector2f(_xMax, _yMax)
     val size = new Vector2f(xSize.toFloat, ySize.toFloat)
     val scaled = allVertices.map(vertex => {
       val p = vertex.position
@@ -143,11 +143,19 @@ class TurtleDrawing() {
       vertices += vertexArray
     })
 
-    this.xMax = scaled.flatten.map(_.position.x).max
-    this.yMax = scaled.flatten.map(_.position.y).max
-    this.xMin = scaled.flatten.map(_.position.x).min
-    this.yMin = scaled.flatten.map(_.position.y).min
-    println(s"max = ${(xMax, yMax)}, min = ${(xMin, yMin)}")
+    this._xMax = scaled.flatten.map(_.position.x).max
+    this._yMax = scaled.flatten.map(_.position.y).max
+    this._xMin = scaled.flatten.map(_.position.x).min
+    this._yMin = scaled.flatten.map(_.position.y).min
+    println(s"max = ${(_xMax, _yMax)}, min = ${(_xMin, _yMin)}")
   }
+
+  def xMax = _xMax
+
+  def xMin = _xMin
+
+  def yMax = _yMax
+
+  def yMin = _yMin
 
 }

@@ -58,8 +58,12 @@ object Main {
       case Keyboard.Key.S => view.move(0, -moveDist * scaleFactor)
       case Keyboard.Key.A => view.move(moveDist * scaleFactor, 0)
       case Keyboard.Key.D => view.move(-moveDist * scaleFactor, 0)
-      case Keyboard.Key.O => ls.redraw(-1); ls.scaleToView(xSize, ySize)
-      case Keyboard.Key.P => ls.redraw(1); ls.scaleToView(xSize, ySize)
+      case Keyboard.Key.O =>
+        ls.redraw(-1)
+        ls.scaleToView(xSize, ySize)
+      case Keyboard.Key.P =>
+        ls.redraw(1)
+        ls.scaleToView(xSize, ySize)
       case Keyboard.Key.UP => selectedLSys = (selectedLSys + 1) % LSystemCount
       case Keyboard.Key.DOWN => {
         selectedLSys = selectedLSys - 1
@@ -94,9 +98,12 @@ object Main {
       // Scale them to the same size (sort of)
       l.scaleToView(xSize, ySize)
     }
+
+    // Main render loop
     while (window.isOpen) {
       // Handle all of the events
-      for (e <- window.pollEvents().asScala) {
+      val eventList = window.pollEvents().asScala
+      for (e <- eventList) {
         handleEvents(window, e, view, lSystems(selectedLSys))
       }
 
