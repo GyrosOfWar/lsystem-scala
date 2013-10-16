@@ -44,22 +44,7 @@ case class LSystem(axiom: String,
       } mkString, n - 1)
     }
 
-    def stepNonRec() = {
-      val sb = new StringBuilder(axiom)
-      for (i <- 0 until iterations) {
-        for (j <- 0 until sb.length) {
-          val cur = sb(i)
-          val newCh = rules(cur, math.random).getOrElse(cur)
-          sb.insert(j, newCh)
-        }
-      }
-      sb.result()
-    }
-
-    //Main.timedCall { stepRec(axiom, iterations) }
-    Main.timedCall {
-      stepNonRec()
-    }
+    stepRec(axiom, iterations)
   }
 
   /**
