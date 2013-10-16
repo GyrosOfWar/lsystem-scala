@@ -148,7 +148,6 @@ class TurtleDrawing() {
     this._yMax = ys.max
     this._xMin = xs.min
     this._yMin = ys.min
-
   }
 
   def xMax = _xMax

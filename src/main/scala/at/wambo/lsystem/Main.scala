@@ -4,8 +4,6 @@ import org.jsfml.graphics._
 import org.jsfml.window.{Keyboard, Mouse, VideoMode}
 import org.jsfml.window.event.Event
 import org.jsfml.system.{Vector2f, Vector2i}
-
-
 import collection.JavaConverters._
 
 /**
@@ -73,6 +71,15 @@ object Main {
     }
   }
 
+  def timedCall[A](block: => A): A = {
+    val t0 = System.nanoTime()
+    val result = block
+    val t1 = System.nanoTime()
+    println(s"Time: ${(t1 - t0) / 1000000.toDouble} ms")
+    result
+  }
+
+
   def main(args: Array[String]) {
     val window = new RenderWindow(new VideoMode(xSize, ySize), "L-System")
     window.setFramerateLimit(60)
@@ -91,7 +98,6 @@ object Main {
     var transform = new Transform()
     transform = Transform.rotate(transform, -90)
     val state = new RenderStates(BlendMode.NONE, transform, null, null)
-
     for (l <- lSystems) {
       // Draw each LSystem to their own TurtleDrawing
       l.draw()
