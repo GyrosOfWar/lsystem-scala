@@ -89,6 +89,8 @@ case class LSystem(axiom: String,
    */
   def scaleToView(xSize: Int, ySize: Int) = td.scaleToView(xSize, ySize)
 
+  def getCenter: Vector2f = td.getCenter
+
   def redraw(iterDelta: Int) = {
     iterations += iterDelta
     td.clear()
