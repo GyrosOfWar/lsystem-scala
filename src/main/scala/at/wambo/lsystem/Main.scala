@@ -4,8 +4,6 @@ import org.jsfml.graphics._
 import org.jsfml.window.{Keyboard, Mouse, VideoMode}
 import org.jsfml.window.event.Event
 import org.jsfml.system.{Vector2f, Vector2i}
-
-
 import collection.JavaConverters._
 
 /**
@@ -61,13 +59,9 @@ object Main {
       case Keyboard.Key.O =>
         ls.redraw(-1)
         ls.scaleToView(xSize, ySize)
-        view.setSize(xSize, ySize)
-        view.setCenter(ls.getCenter)
       case Keyboard.Key.P =>
         ls.redraw(1)
         ls.scaleToView(xSize, ySize)
-        view.setSize(xSize, ySize)
-        view.setCenter(ls.getCenter)
       case Keyboard.Key.UP => selectedLSys = (selectedLSys + 1) % LSystemCount
       case Keyboard.Key.DOWN => {
         selectedLSys = selectedLSys - 1
@@ -85,13 +79,12 @@ object Main {
     result
   }
 
+
   def main(args: Array[String]) {
     val window = new RenderWindow(new VideoMode(xSize, ySize), "L-System")
     window.setFramerateLimit(60)
     val fixed = window.getView
     val view = new View(fixed.getCenter, fixed.getSize)
-    view.setSize(xSize, ySize)
-    view.move(-xSize / 4.0f, -ySize)
 
     val koch = LSystem.KochCurve(6)
     val dragonCurve = LSystem.DragonCurve(12)
@@ -105,13 +98,11 @@ object Main {
     var transform = new Transform()
     transform = Transform.rotate(transform, -90)
     val state = new RenderStates(BlendMode.NONE, transform, null, null)
-
     for (l <- lSystems) {
       // Draw each LSystem to their own TurtleDrawing
       l.draw()
       // Scale them to the same size (sort of)
       l.scaleToView(xSize, ySize)
-      view.setCenter(l.getCenter)
     }
 
     // Main render loop
@@ -125,9 +116,8 @@ object Main {
       window clear Color.WHITE
       // Draw vertices of the LSystems
       for (v <- lSystems(selectedLSys).vertices) {
-        if (v != null) {
+        if (v != null)
           window.draw(v, state)
-        }
       }
 
       // Set the view and swap the buffers

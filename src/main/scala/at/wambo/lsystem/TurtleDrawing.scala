@@ -148,7 +148,6 @@ class TurtleDrawing() {
     this._yMax = ys.max
     this._xMin = xs.min
     this._yMin = ys.min
-
   }
 
   def getCenter = new Vector2f(xMax / 2.0f, yMax / 2.0f)
