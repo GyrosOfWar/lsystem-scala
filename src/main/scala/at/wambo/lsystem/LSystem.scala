@@ -18,6 +18,9 @@ import scala.annotation.tailrec
  * @param distance Distance in pixels to draw forward on when encountering a forward action in the state string
  * @param rules A function that returns Some[String] if given a production that has a defined result, else None.
  */
+
+// TODO add startPos
+// TODO uncouple from TurtleDrawing
 case class LSystem(axiom: String,
                    var iterations: Int,
                    angle: Double,
@@ -31,20 +34,17 @@ case class LSystem(axiom: String,
    */
   def vertices: Seq[VertexArray] = td.vertices.toSeq
 
+  def stepOne(state: String): String = state.map {
+    c => rules(c, math.random) getOrElse c
+  }.mkString
+
   /**
    * Does the given number of iterations based on the given axiom
    * @return state string after the given number of iterations.
    */
   def step: String = {
-    @tailrec
-    def stepRec(current: String, n: Int): String = n match {
-      case 0 => current
-      case _ => stepRec(current.map {
-        c => rules(c, math.random) getOrElse c
-      } mkString, n - 1)
-    }
-
-    stepRec(axiom, iterations)
+    val axiomList = List.fill(iterations + 1)(axiom)
+    axiomList.reduce((a, _) => stepOne(a))
   }
 
   /**
@@ -74,23 +74,6 @@ case class LSystem(axiom: String,
    */
   def draw(): Unit = drawList foreach (_.action(td))
 
-  /**
-   * Returns the minimum and maximum values of all the vertex positions in the LSystem.
-   * @return The first vector in the tuple is the maximum values, the second is the minimum values.
-   */
-  def getBounds: (Vector2f, Vector2f) = {
-    (new Vector2f(td.xMax, td.yMax), new Vector2f(td.xMin, td.yMin))
-  }
-
-  /**
-   * Scales the LSystem to the given window size.
-   * @param xSize Window width
-   * @param ySize Window height
-   */
-  def scaleToView(xSize: Int, ySize: Int) = td.scaleToView(xSize, ySize)
-
-  def getCenter: Vector2f = td.getCenter
-
   def redraw(iterDelta: Int) = {
     iterations += iterDelta
     td.clear()
@@ -99,6 +82,18 @@ case class LSystem(axiom: String,
 }
 
 object LSystem {
+  private def stepAll(lsys: LSystem): Seq[String] = {
+    for(i <- 0 until lsys.iterations) yield {
+      lsys.iterations = i
+      lsys.step
+    }
+  }
+
+  def makeCache(lsys: List[LSystem]): Map[String, List[String]] = {
+
+
+    ???
+  }
 
   def FractalPlant(iterations: Int, distance: Int = 1) = LSystem("F", iterations, Math.toRadians(22), distance)({
     (c: Char, d: Double) => c match {
